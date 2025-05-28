@@ -7,7 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface MovieDao {
+interface movieDao {
     @Query("SELECT * FROM movies")
     suspend fun getAllMovies(): List<Movie>
 
