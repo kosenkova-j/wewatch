@@ -8,14 +8,17 @@
         android:id="@+id/et_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Введите название фильма" />
+        android:hint="Введите название фильма"
+        android:inputType="text"
+        android:minHeight="48dp" />
 
     <EditText
         android:id="@+id/et_movie_year"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Введите год выпуска"
-        android:inputType="number" />
+        android:inputType="number"
+        android:minHeight="48dp" />
 
     <Button
         android:id="@+id/btn_search"
