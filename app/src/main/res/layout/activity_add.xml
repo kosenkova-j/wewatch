@@ -1,0 +1,26 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/et_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Введите название фильма" />
+
+    <EditText
+        android:id="@+id/et_movie_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Введите год выпуска"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btn_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Поиск" />
+
+</LinearLayout>

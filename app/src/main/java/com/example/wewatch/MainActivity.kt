@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         val db = movieDatabase.getDatabase(this)
         movieDao = db.movieDao()
-        adapter = movieAdapter()
+        adapter = MovieAdapter()
 
         findViewById<RecyclerView>(R.id.recycler_view_main).apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
