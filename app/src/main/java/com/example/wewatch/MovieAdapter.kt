@@ -12,17 +12,35 @@ import com.bumptech.glide.Glide
 
 class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
-    private var movies: List<MovieItem> = listOf()
+    private var movies: List<MovieItem> = emptyList()
+    private val checkedMovies = mutableSetOf<Int>() // Теперь храним ID вместо объектов
 
+    //var clickListener: OnMovieClickListener? = null
+    var checkListener: ((Boolean) -> Unit)? = null
     var listener: OnMovieClickListener? = null
 
     interface OnMovieClickListener {
         fun onMovieClick(movie: MovieItem)
+        fun onMovieCheckedChanged(hasCheckedItems: Boolean)
     }
 
     fun setData(movieList: List<MovieItem>) {
         this.movies = movieList
         notifyDataSetChanged()
+        updateCheckedState()
+    }
+
+    fun getCheckedMovies(): List<MovieItem> {
+        return movies.filter { it.ID in checkedMovies }
+    }
+
+    fun hasCheckedItems(): Boolean {
+        return checkedMovies.isNotEmpty()
+    }
+
+    private fun updateCheckedState() {
+        val hasChecked = checkedMovies.isNotEmpty()
+        listener?.onMovieCheckedChanged(hasChecked)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
@@ -36,14 +54,21 @@ class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
         holder.year.text = movie.Year
         Glide.with(holder.itemView.context).load(movie.Poster).into(holder.poster)
 
+        // Set checkbox state without triggering listener
+        holder.checkbox.setOnCheckedChangeListener(null)
+        holder.checkbox.isChecked = checkedMovies.contains(movie.ID)
+
         holder.itemView.setOnClickListener {
-            listener?.onMovieClick(movie) // Передаем выбранный фильм через интерфейс
+            listener?.onMovieClick(movie)
         }
 
         holder.checkbox.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                listener?.onMovieClick(movie) // Передаем фильм на удаление
+                checkedMovies.add(movie.ID)
+            } else {
+                checkedMovies.remove(movie.ID)
             }
+            updateCheckedState()
         }
     }
 
@@ -55,4 +80,6 @@ class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
         val poster: ImageView = itemView.findViewById(R.id.movie_poster)
         val checkbox: CheckBox = itemView.findViewById(R.id.movie_checkbox)
     }
+
+
 }
