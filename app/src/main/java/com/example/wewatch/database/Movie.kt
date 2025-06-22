@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "movies")
 data class Movie(
-    @PrimaryKey val id: Int, // или другой подходящий идентификатор
+    @PrimaryKey val id: String, // Теперь String (например, imdbID "tt1234567")
     val title: String,
     val year: String,
     val poster: String,

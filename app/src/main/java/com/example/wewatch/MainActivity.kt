@@ -1,5 +1,6 @@
 package com.example.wewatch
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -39,14 +40,14 @@ class MainActivity : AppCompatActivity() {
         adapter = MovieAdapter()
         btnDelete = findViewById(R.id.btn_delete)
 
+        // Загрузка данных из базы при старте
+        loadMoviesFromDatabase()
+
         // Инициализация RecyclerView
         findViewById<RecyclerView>(R.id.recycler_view_main).apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = this@MainActivity.adapter
         }
-
-        // Загрузка данных из базы при старте
-        loadMoviesFromDatabase()
 
         // Обработчик кликов
         adapter.listener = object : MovieAdapter.OnMovieClickListener {
@@ -71,10 +72,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadMoviesFromDatabase()
+    }
+
     private fun loadMoviesFromDatabase() {
         CoroutineScope(Dispatchers.IO).launch {
             val movies = movieDao.getAllMovies().map {
-                MovieItem(it.id, it.title, it.year, it.poster)
+                MovieItem(
+                    imdbID = it.id, // Теперь id — строка (imdbID)
+                    Title = it.title,
+                    Year = it.year,
+                    Poster = it.poster
+                )
             }
             withContext(Dispatchers.Main) {
                 movieList.clear()
@@ -88,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             movieDao.delete(movie.toMovie())
             withContext(Dispatchers.Main) {
-                movieList.removeAll { it.ID == movie.ID }
+                movieList.removeAll { it.imdbID == movie.imdbID }
                 adapter.setData(movieList)
                 Toast.makeText(this@MainActivity, "${movie.Title} удален", Toast.LENGTH_SHORT).show()
                 updateDeleteButtonVisibility()
@@ -124,13 +135,13 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            val id = data.getIntExtra(MOVIE_ID, -1)
+            val imdbID = data.getStringExtra(MOVIE_ID)
             val title = data.getStringExtra(MOVIE_TITLE)
             val year = data.getStringExtra(MOVIE_YEAR)
             val poster = data.getStringExtra(MOVIE_POSTER)
 
-            if (id != -1 && title != null && year != null && poster != null) {
-                val movie = MovieItem(id, title, year, poster)
+            if (imdbID != null && title != null && year != null && poster != null) {
+                val movie = MovieItem(imdbID, title, year, poster)
                 CoroutineScope(Dispatchers.IO).launch {
                     movieDao.insert(movie.toMovie())
                     withContext(Dispatchers.Main) {

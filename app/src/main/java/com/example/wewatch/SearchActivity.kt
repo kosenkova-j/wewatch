@@ -2,6 +2,7 @@ package com.example.wewatch
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,7 +27,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-
         // Инициализация Room Database
         val db = movieDatabase.getDatabase(this)
         movieDao = db.movieDao()
@@ -40,6 +40,7 @@ class SearchActivity : AppCompatActivity() {
 
         val year = intent.getStringExtra("YEAR")
         val query = intent.getStringExtra("QUERY") ?: return
+        val intent = Intent(this, MainActivity::class.java)
 
         // Загрузка данных
         CoroutineScope(Dispatchers.IO).launch {
@@ -70,11 +71,16 @@ class SearchActivity : AppCompatActivity() {
             val selectedMovies = adapter.getCheckedMovies()
             if (selectedMovies.isNotEmpty()) {
                 CoroutineScope(Dispatchers.IO).launch {
+                    // Логируем ID перед сохранением
+                    selectedMovies.forEach { movie ->
+                        Log.d("SAVE_TEST", "Saving movie: ${movie.imdbID} - ${movie.Title}")
+                    }
+                    // Сохраняем все фильмы с их imdbID
                     movieDao.insertAll(selectedMovies.map { it.toMovie() })
-
                     withContext(Dispatchers.Main) {
                         setResult(RESULT_OK)
                         finish()
+                        startActivity(intent)
                     }
                 }
             }

@@ -15,7 +15,12 @@ abstract class movieDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): movieDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(context.applicationContext, movieDatabase::class.java, "movie_database").build()
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    movieDatabase::class.java,
+                    "movie_database")
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }
